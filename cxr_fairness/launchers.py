@@ -8,8 +8,15 @@ import os
 
 #changed
 def local_launcher(commands, output_dirs=None, **kwargs):
+    print("Local launcher called with commands:", commands)
     for cmd in commands:
-        subprocess.call(cmd, shell=True)
+        print("Executing command:", cmd)
+        try:
+            result = subprocess.run(cmd, shell=True, check=True)
+            print("Command executed successfully with return code:", result.returncode)
+        except subprocess.CalledProcessError as e:
+            print("Command failed with error:", e)
+            print("Command output:", e.output if hasattr(e, 'output') else "No output available")
                 
 def slurm_launcher(commands, max_slurm_jobs, output_dirs):
     for output_dir, cmd in zip(output_dirs, commands):

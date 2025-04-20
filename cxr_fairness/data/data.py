@@ -53,7 +53,9 @@ def get_dataset(dfs_all, env, split = None, concat_group = False, protected_attr
         
     for c, s in enumerate(splits):
         cache_dir = Path(Constants.cache_dir)/ f'{env}/'
-        cache_dir.mkdir(parents=True, exist_ok=True)
+        #CHANGED
+        if use_cache:
+            cache_dir.mkdir(parents=True, exist_ok=True)
         datasets.append(ConcatWrapper(
                 AllDatasetsShared(dfs[c], label_set = Constants.take_labels if smaller_label_set else Constants.take_labels_all,
                                 transform = transforms.Compose(image_transforms), split = split, 

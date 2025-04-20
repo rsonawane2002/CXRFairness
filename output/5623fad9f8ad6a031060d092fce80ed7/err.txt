@@ -1,0 +1,33 @@
+Traceback (most recent call last):
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/train.py", line 202, in <module>
+    for xy in next(train_minibatches_iterator)]
+  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/lib/infinite_data_loader.py", line 86, in __iter__
+    yield next(self._infinite_iterator)
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
+    data = self._next_data()
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1199, in _next_data
+    return self._process_data(data)
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1225, in _process_data
+    data.reraise()
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/_utils.py", line 429, in reraise
+    raise self.exc_type(msg)
+FileNotFoundError: Caught FileNotFoundError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/worker.py", line 202, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py", line 44, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py", line 44, in <listcomp>
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/data/data.py", line 87, in __getitem__
+    x, y, meta = self.ds[idx]
+  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/data/data.py", line 128, in __getitem__
+    img = np.array(Image.open(item["path"]))
+  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/PIL/Image.py", line 2904, in open
+    fp = builtins.open(filename, "rb")
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/rohitsonawane/Documents/CheXpert-v1.0-small/CheXpert-v1.0-small/train/patient37882/study6/view1_frontal.jpg'
+

@@ -28,6 +28,7 @@ class Job:
     RUNNING = 'Running'
 
     def __init__(self, train_args, sweep_output_root, slurm_pre, script_name, no_output_dir = False, running_jobs_list = []):
+        print("Creating job with args:", train_args)
         args_str = json.dumps(train_args, sort_keys=True)
         args_hash = hashlib.md5(args_str.encode('utf-8')).hexdigest()
         self.no_output_dir  = no_output_dir 
@@ -36,7 +37,9 @@ class Job:
             self.output_dir = os.path.join(sweep_output_root, args_hash)        
             self.train_args['output_dir'] = self.output_dir
 
-        command = ['python -m ', 'cxr_debias.' + script_name]
+        #HERE
+        command = ['python -m', 'cxr_fairness.' + script_name]
+        print("Creating job with args:", train_args)
         for k, v in sorted(self.train_args.items()):
             if isinstance(v, (list, tuple)):
                 v = ' '.join([str(v_) for v_ in v])
@@ -45,7 +48,8 @@ class Job:
                 
             if k: 
                 if not isinstance(v, bool):
-                   command.append(f'--{k} {v}')
+                   command.append(f'--{k}')
+                   command.append(str(v))
                 else:
                     if v:
                         command.append(f'--{k}')
@@ -53,9 +57,15 @@ class Job:
                         pass
                 
         self.command_str = ' '.join(command)
-        self.command_str = f'sbatch {slurm_pre} --wrap "{self.command_str}"' 
+        print("Final command string:", self.command_str)
+
+        if slurm_pre:
+            self.command_str = f'sbatch {slurm_pre} --wrap "{self.command_str}"' 
+        else:
+            # For local execution, directly use the command
+            self.command_str = self.command_str
         
-        print(self.command_str)
+        print("Final command after slurm:", self.command_str)
         
         if not no_output_dir and os.path.exists(os.path.join(self.output_dir, 'done')):
             self.state = Job.DONE
@@ -72,6 +82,7 @@ class Job:
                     self.state = Job.INCOMPLETE                
             else:
                 self.state = Job.INCOMPLETE
+            
         else:
             self.state = Job.NOT_LAUNCHED
             
@@ -121,12 +132,17 @@ if __name__ == "__main__":
     parser.add_argument('--experiment', type=str, required = True)
     parser.add_argument('--output_root', type=str)
     parser.add_argument('--skip_confirmation', action='store_true')
-    parser.add_argument('--slurm_pre', type=str, required = True)  
+    #CHANGED HERE
+    parser.add_argument('--slurm_pre', type=str, help="Slurm prefix for sbatch job", default=None) 
     parser.add_argument('--command_launcher', type=str, required=True)
     parser.add_argument('--max_slurm_jobs', type=int, default = 400)
     parser.add_argument('--no_output_dir', action = 'store_true')
     parser.add_argument('--restart_running', action='store_true', help = 'cancel and re-run all currently running Slurm jobs')
-    args = parser.parse_args()        
+    args = parser.parse_args()     
+
+    # If using 'local' command launcher, slurm_pre is not required (CHANGED)
+    if args.command_launcher == 'local':
+        args.slurm_pre = None   
     
     args_list = make_args_list(args.experiment)
     running_jobs_list = list(chain(*launchers.get_slurm_jobs(getpass.getuser()))) if args.command_launcher == 'slurm' else []
@@ -134,6 +150,7 @@ if __name__ == "__main__":
     jobs = [Job(train_args, args.output_root, args.slurm_pre, experiments.get_script_name(args.experiment), args.no_output_dir,
         running_jobs_list) for train_args in args_list]
     
+
     for job in jobs:
         print(job)
     print("{} jobs: {} done, {} running, {} incomplete/crashed, {} not launched.".format(
@@ -156,7 +173,11 @@ if __name__ == "__main__":
         print(f'About to launch {len(to_launch)} jobs.')
         if not args.skip_confirmation:
             ask_for_confirmation()
-        launcher_fn = launchers.REGISTRY[args.command_launcher]
+        if args.command_launcher == 'local':
+            launcher_fn = launchers.local_launcher
+        else:
+            launcher_fn = launchers.slurm_launcher
+
         Job.launch(to_launch, launcher_fn, max_slurm_jobs = args.max_slurm_jobs)
 
     elif args.command == 'delete_incomplete':

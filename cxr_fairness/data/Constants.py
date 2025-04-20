@@ -3,11 +3,11 @@ from collections import defaultdict
 
 #-------------------------------------------
 image_paths = {
-    'MIMIC': '/scratch/hdd001/projects/ml4h/projects/mimic_access_required/MIMIC-CXR-JPG', # MIMIC-CXR
-    'CXP': '/scratch/hdd001/projects/ml4h/projects/CheXpert/', # CheXpert
+    'MIMIC': '/Users/rohitsonawane/Documents/MIMIC-CXR-JPG', # MIMIC-CXR
+    'CXP': '/Users/rohitsonawane/Documents/CheXpert-v1.0-small', # CheXpert
 }
 
-CXP_details = "/scratch/hdd001/projects/ml4h/projects/CheXpert/CHEXPERT DEMO.xlsx"
+CXP_details = "/Users/rohitsonawane/Documents/chexpertdemodata-2/CHEXPERT DEMO.xlsx"
 
 cache_dir = '/scratch/ssd001/home/haoran/projects/IRM_Clinical/cache'
 #-------------------------------------------
