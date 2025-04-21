@@ -46,6 +46,5 @@ Args:
 	val_subset: 12288
 	weight_decay: 0.0
 Number of parameters: 7479682
-HEREEEE 
-epoch         loss          optimal_thre  roc           roc_gap       step          step_time     worst_roc    
-0.0000000000  0.6409558058  0.6000000000  0.1428571429  0.0000000000  0             28.430299043  0.1428571429 
+epoch         f1_score      loss          optimal_thre  precision     recall        roc           roc_gap       step          step_time     worst_roc    
+0.0000000000  0.8166666667  0.6409558058  0.6000000000  0.7656250000  0.8750000000  0.1428571429  0.0000000000  0             34.057050943  0.1428571429 

@@ -215,6 +215,10 @@ else:
 
 checkpoint_vals = collections.defaultdict(lambda: [])
 last_results_keys = None
+
+#temporary paramters
+checkpoint_freq = 1
+n_steps = 25
 for step in range(start_step, n_steps):
     if es.early_stop:
         break
@@ -240,8 +244,7 @@ for step in range(start_step, n_steps):
             results[key] = np.mean(val)
 
         results.update(eval_helper.eval_metrics(algorithm, eval_loader, device = device, protected_attr = args.protected_attr)[0])
-        print("HEREEEE ")
-        
+
         results_keys = sorted(results.keys())
         if results_keys != last_results_keys:
             misc.print_row(results_keys, colwidth=12)
@@ -277,7 +280,7 @@ save_dict = {
 val_loader = DataLoader(
         dataset=val_ds,
         batch_size=hparams['batch_size']*4,
-        num_workers=1)
+        num_workers=0)
 
 val_metrics, val_pred_df = eval_helper.eval_metrics(algorithm, val_loader, device = device, protected_attr = args.protected_attr)
 test_metrics, test_pred_df = eval_helper.eval_metrics(algorithm, test_loader, device = device, protected_attr = args.protected_attr)
