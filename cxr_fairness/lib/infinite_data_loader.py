@@ -1,6 +1,7 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 import torch
+import time
 
 class StatefulSampler(torch.utils.data.sampler.Sampler):
     def __init__(self, data_source, shuffle=False):
@@ -19,7 +20,15 @@ class StatefulSampler(torch.utils.data.sampler.Sampler):
         self.data_counter = 0
 
     def __iter__(self):
-        return self
+        while True:
+            # Yield from current data_counter to end of indices
+            while self.data_counter < len(self.indices):
+                idx = self.indices[self.data_counter]
+                self.data_counter += 1
+                yield int(idx)
+            # Reinitialize indices after full pass
+            self.init_index()
+        #return self
 
     def __len__(self):
         return len(self.data)
@@ -63,6 +72,7 @@ class _InfiniteSampler(torch.utils.data.Sampler):
             for batch in self.sampler:
                 yield batch
 
+
 class InfiniteDataLoader:
     def __init__(self, dataset, weights, batch_size, num_workers):
         super().__init__()
@@ -77,7 +87,7 @@ class InfiniteDataLoader:
 
         self._infinite_iterator = iter(torch.utils.data.DataLoader(
             dataset,
-            num_workers=num_workers,
+            num_workers= num_workers,
             batch_sampler=_InfiniteSampler(batch_sampler)
         ))
 

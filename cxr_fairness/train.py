@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader
 from cxr_fairness import algorithms
 from cxr_fairness.lib import misc
 from cxr_fairness.data import Constants, data
-from cxr_fairness.lib.infinite_data_loader import InfiniteDataLoader
+from cxr_fairness.lib.infinite_data_loader import InfiniteDataLoader, StatefulSampler
 from cxr_fairness.utils import EarlyStopping, has_checkpoint, load_checkpoint, save_checkpoint
 from cxr_fairness import eval_helper
 
@@ -70,6 +70,7 @@ parser.add_argument('--JTT_ERM_model_folder', type = str)
 parser.add_argument('--JTT_weight', default = 3.0, type = float)
 parser.add_argument('--JTT_threshold', default = 0.5, type = float)
 args = parser.parse_args()
+
 
 if args.subset_group in  ['0', '1', '2']:
     args.subset_group = int(args.subset_group)
@@ -133,6 +134,7 @@ ds_args = {
     'subset_label': None if hparams['task'] == 'multitask' else hparams['task']
 }
 
+
 if hparams['data_type'] in ['normal', 'single_group']:
     train_dss = [data.get_dataset(dfs_all, split = 'train', augment = 1, **ds_args)]
 else:
@@ -140,15 +142,19 @@ else:
     train_dss = [data.get_dataset(data.load_df(hparams['dataset'], hparams['val_fold'], query_str = query_str), 
                         split = 'train', augment = 1, **ds_args) for query_str in query_strs]
 
+
 train_loaders = [InfiniteDataLoader(
         dataset=i,
         weights=None,
         batch_size=hparams['batch_size'],
-        num_workers=1)
+        num_workers=0)
         for i in train_dss
         ]
+
 val_ds = data.get_dataset(dfs_all, split = 'val', augment = 0, **ds_args)
 test_ds = data.get_dataset(dfs_all, split = 'test', augment = 0, **ds_args)
+
+
 
 if args.val_subset:
     val_ds_es = torch.utils.data.Subset(val_ds, np.random.choice(np.arange(len(val_ds)), min(args.val_subset, len(val_ds)), replace = False))
@@ -161,12 +167,13 @@ if args.debug:
 eval_loader = DataLoader(
         dataset=val_ds_es,
         batch_size=hparams['batch_size']*4,
-        num_workers=1)
+        num_workers=0)
     
 test_loader = DataLoader(
         dataset=test_ds,
         batch_size=hparams['batch_size']*4,
-        num_workers=1)
+        num_workers=0)
+
 
 algorithm_class = algorithms.get_algorithm_class(args.algorithm)
 algorithm = algorithm_class(hparams['num_classes'], hparams)
@@ -174,7 +181,19 @@ algorithm.to(device)
 
 print("Number of parameters: %s" % sum([np.prod(p.size()) for p in algorithm.parameters()]))
 
+'''
+print("[DEBUG] Testing each train_loader individually...")
+for i, loader in enumerate(train_loaders):
+    print(f"[DEBUG] Trying to get batch from loader {i}")
+    try:
+        batch = next(iter(loader))
+        print(f"[DEBUG] Loader {i} succeeded. Batch types: {[type(x) for x in batch]}")
+    except Exception as e:
+        print(f"[ERROR] Loader {i} failed: {e}")
+'''
+
 train_minibatches_iterator = zip(*train_loaders)   
+
 steps_per_epoch = min([len(i)/hparams['batch_size'] for i in train_dss])
 n_steps = args.max_steps
 checkpoint_freq = args.checkpoint_freq
@@ -192,6 +211,8 @@ if has_checkpoint():
 else:
     start_step = 0        
 
+
+
 checkpoint_vals = collections.defaultdict(lambda: [])
 last_results_keys = None
 for step in range(start_step, n_steps):
@@ -200,12 +221,14 @@ for step in range(start_step, n_steps):
     step_start_time = time.time()
     minibatches_device = [(misc.to_device(xy[0], device), misc.to_device(xy[1], device))
         for xy in next(train_minibatches_iterator)]
+
     algorithm.train()
     step_vals = algorithm.update(minibatches_device, device)
     checkpoint_vals['step_time'].append(time.time() - step_start_time)
 
     for key, val in step_vals.items():
         checkpoint_vals[key].append(val)
+    
         
     if step % checkpoint_freq == 0:
         results = {
@@ -217,14 +240,15 @@ for step in range(start_step, n_steps):
             results[key] = np.mean(val)
 
         results.update(eval_helper.eval_metrics(algorithm, eval_loader, device = device, protected_attr = args.protected_attr)[0])
-            
+        print("HEREEEE ")
+        
         results_keys = sorted(results.keys())
         if results_keys != last_results_keys:
             misc.print_row(results_keys, colwidth=12)
             last_results_keys = results_keys
         misc.print_row([results[key] for key in results_keys],
             colwidth=12)
-
+    
         results.update({
             'hparams': hparams,   
         })

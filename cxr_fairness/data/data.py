@@ -14,6 +14,17 @@ def load_df(env, val_fold, only_frontal = False, query_str = None):
     df = pd.read_csv(Constants.df_paths[env])
     func = process.get_process_func(env)
     df = func(df, only_frontal)
+
+    p19_path = '/Users/rohitsonawane/Documents/MIMIC-CXR-JPG/files/p19'  # update this to your actual path
+    existing_subfolders = [
+        f.name for f in Path(p19_path).iterdir()
+        if f.is_dir()
+    ]
+
+    pattern = '|'.join([f'/p19/{sf}' for sf in existing_subfolders])
+    df = df[df['path'].str.contains(pattern)]
+
+
     if query_str is not None:
         df = df.query(query_str)
     train_folds = [i for i in df.fold_id.unique() if i not in ['test', val_fold]]
@@ -160,7 +171,8 @@ class AllDatasetsShared(Dataset):
         
         if self.transform is not None: # apply image augmentations after caching
             img = self.transform(img)        
-                
+    
+
         return img, label, meta
             
 

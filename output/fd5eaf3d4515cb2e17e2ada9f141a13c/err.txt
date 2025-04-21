@@ -1,35 +1,0 @@
-Downloading: "https://download.pytorch.org/models/densenet121-a639ec97.pth" to /Users/rohitsonawane/.cache/torch/hub/checkpoints/densenet121-a639ec97.pth
-  0%|          | 0.00/30.8M [00:00<?, ?B/s]  2%|1         | 600k/30.8M [00:00<00:05, 5.76MB/s]  3%|3         | 0.98M/30.8M [00:00<00:06, 5.09MB/s]  5%|5         | 1.58M/30.8M [00:00<00:05, 5.18MB/s]  6%|6         | 1.90M/30.8M [00:00<00:09, 3.34MB/s] 13%|#3        | 4.08M/30.8M [00:00<00:06, 4.47MB/s] 16%|#6        | 5.00M/30.8M [00:00<00:05, 5.26MB/s] 19%|#8        | 5.81M/30.8M [00:00<00:04, 5.33MB/s] 24%|##4       | 7.43M/30.8M [00:00<00:03, 6.68MB/s] 27%|##7       | 8.41M/30.8M [00:01<00:03, 7.19MB/s] 30%|###       | 9.34M/30.8M [00:01<00:03, 6.69MB/s] 34%|###3      | 10.5M/30.8M [00:01<00:02, 7.33MB/s] 37%|###6      | 11.3M/30.8M [00:01<00:02, 6.84MB/s] 42%|####1     | 13.0M/30.8M [00:01<00:02, 8.27MB/s] 45%|####5     | 14.0M/30.8M [00:01<00:02, 8.51MB/s] 48%|####8     | 14.9M/30.8M [00:01<00:02, 7.16MB/s] 53%|#####3    | 16.4M/30.8M [00:02<00:01, 8.41MB/s] 56%|#####6    | 17.4M/30.8M [00:02<00:01, 8.86MB/s] 59%|#####9    | 18.3M/30.8M [00:02<00:01, 8.10MB/s] 63%|######2   | 19.4M/30.8M [00:02<00:01, 8.75MB/s] 66%|######5   | 20.3M/30.8M [00:02<00:01, 7.84MB/s] 69%|######8   | 21.2M/30.8M [00:02<00:01, 7.88MB/s] 72%|#######2  | 22.3M/30.8M [00:02<00:01, 7.28MB/s] 80%|#######9  | 24.6M/30.8M [00:02<00:00, 9.14MB/s] 83%|########3 | 25.7M/30.8M [00:03<00:01, 4.84MB/s] 87%|########7 | 26.9M/30.8M [00:03<00:00, 5.33MB/s] 90%|########9 | 27.7M/30.8M [00:03<00:00, 5.28MB/s] 92%|#########2| 28.5M/30.8M [00:03<00:00, 5.48MB/s] 97%|#########7| 30.0M/30.8M [00:04<00:00, 6.80MB/s]100%|##########| 30.8M/30.8M [00:04<00:00, 7.73MB/s]
-Traceback (most recent call last):
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/runpy.py", line 193, in _run_module_as_main
-    "__main__", mod_spec)
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/runpy.py", line 85, in _run_code
-    exec(code, run_globals)
-  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/train.py", line 202, in <module>
-    for xy in next(train_minibatches_iterator)]
-  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/lib/infinite_data_loader.py", line 86, in __iter__
-    yield next(self._infinite_iterator)
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
-    data = self._next_data()
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1199, in _next_data
-    return self._process_data(data)
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/dataloader.py", line 1225, in _process_data
-    data.reraise()
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/_utils.py", line 429, in reraise
-    raise self.exc_type(msg)
-FileNotFoundError: Caught FileNotFoundError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/worker.py", line 202, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py", line 44, in fetch
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/torch/utils/data/_utils/fetch.py", line 44, in <listcomp>
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/data/data.py", line 87, in __getitem__
-    x, y, meta = self.ds[idx]
-  File "/Users/rohitsonawane/Documents/CXR_Fairness/cxr_fairness/data/data.py", line 128, in __getitem__
-    img = np.array(Image.open(item["path"]))
-  File "/opt/miniconda3/envs/cxr_fairness/lib/python3.7/site-packages/PIL/Image.py", line 2904, in open
-    fp = builtins.open(filename, "rb")
-FileNotFoundError: [Errno 2] No such file or directory: '/Users/rohitsonawane/Documents/MIMIC-CXR-JPG/files/p13/p13207656/s54769130/6cf2e329-b56649b1-4662a441-f137d8fe-d449a719.jpg'
-

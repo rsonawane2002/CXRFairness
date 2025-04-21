@@ -8,6 +8,7 @@ from cxr_fairness.utils import compute_opt_thres
 
 def predict_on_set(algorithm, loader, device, add_fields = ('sex', 'race')):
     preds, targets, paths, adds = [], [], [], {i:[] for i in add_fields}
+
     with torch.no_grad():
         for x, y, meta in loader:
             x = misc.to_device(x, device)
